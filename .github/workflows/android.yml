@@ -1,9 +1,10 @@
-name: Android CI
+name: Build APK
 
 on:
   push:
     branches:
-      - main
+      - ana
+  pull_request:
 
 jobs:
   build:
@@ -11,31 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repo'dan Kodu Çek
+      - name: Kodları çek
         uses: actions/checkout@v3
 
-      - name: JDK Kurulumu
+      - name: Java kurulumu
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Gradle Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+      - name: Gradle önbellek
+        uses: gradle/gradle-build-action@v2
 
-      - name: Gradle İzin Ver
-        run: chmod +x ./gradlew
-
-      - name: APK Oluştur
+      - name: APK derle
         run: ./gradlew assembleDebug
 
-      - name: APK’yı Yayınla
+      - name: APK dosyasını yükle
         uses: actions/upload-artifact@v3
         with:
-          name: app-debug.apk
+          name: Kurdistan3DMarabası-APK
           path: app/build/outputs/apk/debug/app-debug.apk
