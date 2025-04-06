@@ -1,36 +1,41 @@
-name: Android CI
+name: Build APK
 
 on:
   push:
     branches:
       - ana
   pull_request:
-    branches:
-      - ana
 
 jobs:
   build:
-    name: Build APK
+    name: Build Debug APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout kodu
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Java'yı kur
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-      - name: Build Debug APK
+      - name: Gradle ile build et
         run: ./gradlew assembleDebug
 
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v3
+      - name: APK dosyasını yükle
+        uses: actions/upload-artifact@v4
         with:
           name: Kurdistan3DMap-APK
           path: app/build/outputs/apk/debug/app-debug.apk
